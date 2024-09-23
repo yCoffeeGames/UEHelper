@@ -48,14 +48,21 @@ class VIEW3D_PT_UEHelper(bpy.types.Panel):
         row.operator(SetOriginToCenterOperator.bl_idname,
                      text=SetOriginToCenterOperator.bl_label)
 
+def menu_func(self, context):
+    self.layout.operator(AddExtraObjectsOperator.bl_idname, text="Plane*", icon="MESH_PLANE").mesh = "Plane"
+    self.layout.operator(AddExtraObjectsOperator.bl_idname, text="Cube*", icon="MESH_CUBE").mesh = "Cube"
+    self.layout.operator(AddExtraObjectsOperator.bl_idname, text="Cylinder*", icon="MESH_CYLINDER").mesh = "Cylinder"
+    self.layout.separator()
 
 def register():
     auto_load.register()
     bpy.utils.register_class(VIEW3D_PT_UEHelper)
+    bpy.types.VIEW3D_MT_mesh_add.prepend(menu_func)
     bpy.app.translations.register(__name__, ops_dict)
 
 
 def unregister():
     bpy.app.translations.unregister(__name__)
+    bpy.types.VIEW3D_MT_mesh_add.remove(menu_func)
     bpy.utils.unregister_class(VIEW3D_PT_UEHelper)
     auto_load.unregister()
