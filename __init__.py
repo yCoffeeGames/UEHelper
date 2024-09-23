@@ -28,6 +28,33 @@ bl_info = {
 
 auto_load.init()
 
+ue_dict = {
+    'zh_HANS': {
+        ('*', 'UE Helper'): '虚幻引擎助手',
+
+        ('Operator', 'Rename For UE'): '为UE重命名',
+        ('*', 'Object Name Prefix'): '物体名称前缀',
+        ('*', 'Add prefix to object names'): '是否增加物体名称前缀',
+        ('*', 'Material Name Prefix'): '材质名称前缀',
+        ('*', 'Add prefix to material names'): '是否增加材质名称前缀',
+
+        ('Operator', 'Mark As UE Collisions'): '标记为UE碰撞体',
+        ('*', 'Convex'): '不规则',
+        ('*', 'Set Parent'): '设置父级',
+        ('*', 'Wireframe Display'): '线框显示',
+
+        ('Operator', 'Set Origin Corner'): '设定边角原点',
+        ('*', 'Index'): '序号',
+        ('*', 'Snap to ground'): '吸附到地面',
+
+        ('Operator', 'Set Origin Center'): '设定中心原点',
+
+        ('Operator', 'Plane*'): '平面*',
+        ('Operator', 'Cube*'): '立方体*',
+        ('Operator', 'Cylinder*'): '柱体*',
+        ('Operator', 'Add Extra Objects'): '添加额外物体'
+    }
+}
 
 class VIEW3D_PT_UEHelper(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
@@ -58,7 +85,7 @@ def register():
     auto_load.register()
     bpy.utils.register_class(VIEW3D_PT_UEHelper)
     bpy.types.VIEW3D_MT_mesh_add.prepend(menu_func)
-    bpy.app.translations.register(__name__, ops_dict)
+    bpy.app.translations.register(__name__, ue_dict)
 
 
 def unregister():

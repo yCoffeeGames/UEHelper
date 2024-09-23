@@ -2,30 +2,6 @@ import bpy
 from bpy.props import StringProperty, BoolProperty, EnumProperty, IntProperty, FloatProperty, FloatVectorProperty
 import mathutils
 
-ops_dict = {
-    'zh_HANS': {
-        ('*', 'UE Helper'): '虚幻引擎助手',
-
-        ('Operator', 'Rename For UE'): '为UE重命名',
-        ('*', 'Object Name Prefix'): '物体名称前缀',
-        ('*', 'Add prefix to object names'): '是否增加物体名称前缀',
-        ('*', 'Material Name Prefix'): '材质名称前缀',
-        ('*', 'Add prefix to material names'): '是否增加材质名称前缀',
-
-        ('Operator', 'Mark As UE Collisions'): '标记为UE碰撞体',
-        ('*', 'Convex'): '不规则',
-        ('*', 'Set Parent'): '设置父级',
-        ('*', 'Wireframe Display'): '线框显示',
-
-        ('Operator', 'Set Origin Corner'): '设定边角原点',
-        ('*', 'Index'): '序号',
-        ('*', 'Snap to ground'): '吸附到地面',
-
-        ('Operator', 'Set Origin Center'): '设定中心原点',
-    }
-}
-
-
 class RenameGameOperator(bpy.types.Operator):
     bl_idname = "ue.rename_game"
     bl_label = "Rename For UE"
@@ -260,14 +236,13 @@ class AddExtraObjectsOperator(bpy.types.Operator):
     def invoke(self, context, event):
         self.align = "WORLD"
         self.location = bpy.context.scene.cursor.location
+        self.rotation = (0,0,0)
         return self.execute(context)
 
     def execute(self, context):
         # Set rotation based on align
         if (self.align == "VIEW"):
             self.rotation = context.region_data.view_matrix.copy().inverted().to_3x3().to_euler()
-        elif (self.align == "WORLD"):
-            self.rotation = (0,0,0)
         elif (self.align == "CURSOR"):
             self.rotation = context.scene.cursor.rotation_euler
         
