@@ -6,7 +6,7 @@ ops_dict = {
     'zh_HANS': {
         ('*', 'UE Helper'): '虚幻引擎助手',
 
-        ('Operator', 'Rename For Game Engines'): '为游戏引擎重命名',
+        ('Operator', 'Rename For UE'): '为UE重命名',
         ('*', 'Object Name Prefix'): '物体名称前缀',
         ('*', 'Add prefix to object names'): '是否增加物体名称前缀',
         ('*', 'Material Name Prefix'): '材质名称前缀',
@@ -29,7 +29,7 @@ ops_dict = {
 
 class RenameGameOperator(bpy.types.Operator):
     bl_idname = "ue.rename_game"
-    bl_label = "Rename For Game Engines"
+    bl_label = "Rename For UE"
     bl_options = {'REGISTER', 'UNDO'}
 
     obj_prefix: StringProperty(name="Object Name Prefix", default="SM_")
