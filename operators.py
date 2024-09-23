@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import StringProperty, BoolProperty, EnumProperty, IntProperty, FloatProperty
 import mathutils
+import time
 
 ops_dict = {
     'zh_HANS': {
@@ -18,11 +19,10 @@ ops_dict = {
         ('*', 'Wireframe Display'): '线框显示',
 
         ('Operator', 'Set Origin Corner'): '设定边角原点',
-        ('*', 'Corner'): '边角',
+        ('*', 'Index'): '序号',
         ('*', 'Snap to ground'): '吸附到地面',
 
         ('Operator', 'Set Origin Center'): '设定中心原点',
-        ('*', 'Center'): '中心',
     }
 }
 
@@ -119,8 +119,8 @@ class SetOriginToCornerOperator(bpy.types.Operator):
     bl_label = "Set Origin Corner"
     bl_options = {'REGISTER', 'UNDO'}
 
-    corner: IntProperty(name="Corner", default=5, min=0, max=7)
-    is_on_ground: BoolProperty(name="Snap to ground", default=False)
+    index: IntProperty(name="Index", default=3, min=0, max=7)
+    is_on_ground: BoolProperty(name="Snap to ground", default=True)
 
     @classmethod
     def poll(cls, context):
@@ -136,17 +136,13 @@ class SetOriginToCornerOperator(bpy.types.Operator):
 
                     for obj in objs:
                         obj.select_set(True)
-                        bpy.ops.object.origin_set(
-                            type='ORIGIN_GEOMETRY', center='MEDIAN')
 
-                        bpy.ops.view3d.snap_cursor_to_center()
                         target_corner = mathutils.Vector(
-                            obj.bound_box[self.corner])
+                            obj.bound_box[self.index])
                         corner_location = obj.matrix_world @ target_corner
+
                         bpy.ops.view3d.snap_cursor_to_selected()
-                        
-                        obj.location = corner_location
-                        
+                        obj.location = obj.location * 2 - corner_location
                         bpy.ops.object.origin_set(
                             type='ORIGIN_CURSOR', center='MEDIAN')
 
@@ -167,13 +163,22 @@ class SetOriginToCornerOperator(bpy.types.Operator):
         return {"FINISHED"}
 
 
+def get_vertices_center_location(world_matrix, vertices):
+    center = [
+        sum(v[0] for v in vertices) / 4,
+        sum(v[1] for v in vertices) / 4,
+        sum(v[2] for v in vertices) / 4,
+    ]
+    return world_matrix @ mathutils.Vector(center)
+
+
 class SetOriginToCenterOperator(bpy.types.Operator):
     bl_idname = "ue.set_origin_center"
     bl_label = "Set Origin Center"
     bl_options = {'REGISTER', 'UNDO'}
 
-    center: IntProperty(name="Center", default=1, min=0, max=1)
-    is_on_ground: BoolProperty(name="Snap to ground", default=False)
+    index: IntProperty(name="Index", default=0, min=0, max=1)
+    is_on_ground: BoolProperty(name="Snap to ground", default=True)
 
     @classmethod
     def poll(cls, context):
@@ -189,26 +194,19 @@ class SetOriginToCenterOperator(bpy.types.Operator):
 
                     for obj in objs:
                         obj.select_set(True)
-                        bpy.ops.object.origin_set(
-                            type='ORIGIN_GEOMETRY', center='MEDIAN')
 
-                        bpy.ops.view3d.snap_cursor_to_center()
-                        # target_position = mathutils.Vector(
-                        #     obj.bound_box[self.corner])
-                        # corner_location = obj.matrix_world @ target_position
-                        vertices = [0, 3, 4, 7] if self.center == 0 else [
-                            1, 2, 5, 6]
                         target_vertices = [mathutils.Vector(
-                            obj.bound_box[v]) for v in vertices]
-                        target_center = [
-                            sum(v[0] for v in target_vertices) / 4,
-                            sum(v[1] for v in target_vertices) / 4,
-                            sum(v[2] for v in target_vertices) / 4,
-                        ]
-                        center_location = obj.matrix_world @ mathutils.Vector(
-                            target_center)
+                            obj.bound_box[v]) for v in [1, 2, 5, 6]]
+                        origin_vertices = [mathutils.Vector(
+                            obj.bound_box[v]) for v in [0, 3, 4, 7]]
+                        target_location = get_vertices_center_location(
+                            obj.matrix_world, target_vertices)
+                        origin_location = get_vertices_center_location(
+                            obj.matrix_world, origin_vertices)
+
                         bpy.ops.view3d.snap_cursor_to_selected()
-                        obj.location = center_location
+                        offset = target_location if self.index == 1 else origin_location
+                        obj.location = obj.location * 2 - offset
                         bpy.ops.object.origin_set(
                             type='ORIGIN_CURSOR', center='MEDIAN')
 
