@@ -68,11 +68,9 @@ class VIEW3D_PT_UEHelper(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        col = layout.column()
+        col = layout.column(align=True)
         col.operator("ue.rename_game", text="Rename for UE", icon="FILE_FONT")
         col.operator("ue.mark_ue_collision", text="Mark as UE collisions", icon="OUTLINER_OB_POINTCLOUD")
-        
-        layout.separator()
 
         col = layout.column(align=True)
         row = col.row(align=True)
@@ -81,6 +79,9 @@ class VIEW3D_PT_UEHelper(bpy.types.Panel):
         row = col.row(align=True)
         row.operator("ue.apply_transform", text="Apply transform", icon="EMPTY_AXIS")
         row.operator("ue.reset_transform", text="Reset transform", icon="LOOP_BACK")
+
+        col = layout.column(align=True)
+        col.operator("ue.select_objects", text="Select objects", icon="EYEDROPPER")
 
 
 def menu_func(self, context):
