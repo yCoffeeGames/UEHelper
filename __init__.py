@@ -52,7 +52,10 @@ ue_dict = {
         ('Operator', 'Plane*'): '平面*',
         ('Operator', 'Cube*'): '立方体*',
         ('Operator', 'Cylinder*'): '柱体*',
-        ('Operator', 'Add extra objects'): '添加额外物体'
+        ('Operator', 'Add extra objects'): '添加额外物体',
+
+        ('Operator', 'Apply transform'): '应用置换',
+        ('Operator', 'Reset transform'): '重置置换'
     }
 }
 
@@ -66,13 +69,18 @@ class VIEW3D_PT_UEHelper(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         col = layout.column()
-        col.operator("ue.rename_game",
-                     text="Rename for UE")
-        col.operator("ue.mark_ue_collision",
-                     text="Mark as UE collisions")
+        col.operator("ue.rename_game", text="Rename for UE", icon="FILE_FONT")
+        col.operator("ue.mark_ue_collision", text="Mark as UE collisions", icon="OUTLINER_OB_POINTCLOUD")
+        
+        layout.separator()
+
+        col = layout.column(align=True)
         row = col.row(align=True)
-        row.operator("ue.set_origin_corner", text="Set origin corner")
-        row.operator("ue.set_origin_center", text="Set origin center")
+        row.operator("ue.set_origin_corner", text="Set origin corner", icon="OBJECT_ORIGIN")
+        row.operator("ue.set_origin_center", text="Set origin center", icon="SNAP_FACE_CENTER")
+        row = col.row(align=True)
+        row.operator("ue.apply_transform", text="Apply transform", icon="EMPTY_AXIS")
+        row.operator("ue.reset_transform", text="Reset transform", icon="LOOP_BACK")
 
 
 def menu_func(self, context):
