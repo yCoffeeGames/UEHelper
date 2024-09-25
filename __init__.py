@@ -55,7 +55,9 @@ ue_dict = {
         ('Operator', 'Add extra objects'): '添加额外物体',
 
         ('Operator', 'Apply transform'): '应用置换',
-        ('Operator', 'Reset transform'): '重置置换'
+        ('Operator', 'Reset transform'): '重置置换',
+
+        ('Operator', 'Select objects'): '选择物体',
     }
 }
 
