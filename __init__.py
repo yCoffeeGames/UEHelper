@@ -58,6 +58,10 @@ ue_dict = {
         ('Operator', 'Reset transform'): '重置置换',
 
         ('Operator', 'Select objects'): '选择物体',
+
+        ('Operator', 'Toggle face orientation'): '开关面朝向',
+        ('*', 'Face orientation: On'): '面朝向: 开',
+        ('*', 'Face orientation: Off'): '面朝向: 关'
     }
 }
 
@@ -84,6 +88,9 @@ class VIEW3D_PT_UEHelper(bpy.types.Panel):
 
         col = layout.column(align=True)
         col.operator("ue.select_objects", text="Select objects", icon="EYEDROPPER")
+
+        col = layout.column(align=True)
+        col.operator("ue.toggle_face_orientation", text="Toggle face orientation", icon="NORMALS_FACE")
 
 
 def menu_func(self, context):
