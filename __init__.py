@@ -19,7 +19,7 @@ bl_info = {
     "author": "yCoffeeGames",
     "description": "https://space.bilibili.com/1782986697",
     "blender": (2, 80, 0),
-    "version": (1, 0, 0),
+    "version": (1, 1, 0),
     "location": "VIEW_3D / UE",
     "warning": "",
     "category": "Generic"
