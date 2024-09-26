@@ -76,21 +76,28 @@ class VIEW3D_PT_UEHelper(bpy.types.Panel):
         layout = self.layout
         col = layout.column(align=True)
         col.operator("ue.rename_game", text="Rename for UE", icon="FILE_FONT")
-        col.operator("ue.mark_ue_collision", text="Mark as UE collisions", icon="OUTLINER_OB_POINTCLOUD")
+        col.operator("ue.mark_ue_collision",
+                     text="Mark as UE collisions", icon="OUTLINER_OB_POINTCLOUD")
 
         col = layout.column(align=True)
         row = col.row(align=True)
-        row.operator("ue.set_origin_corner", text="Set origin corner", icon="OBJECT_ORIGIN")
-        row.operator("ue.set_origin_center", text="Set origin center", icon="SNAP_FACE_CENTER")
+        row.operator("ue.set_origin_corner",
+                     text="Set origin corner", icon="OBJECT_ORIGIN")
+        row.operator("ue.set_origin_center",
+                     text="Set origin center", icon="SNAP_FACE_CENTER")
         row = col.row(align=True)
-        row.operator("ue.apply_transform", text="Apply transform", icon="EMPTY_AXIS")
-        row.operator("ue.reset_transform", text="Reset transform", icon="LOOP_BACK")
+        row.operator("ue.apply_transform",
+                     text="Apply transform", icon="EMPTY_AXIS")
+        row.operator("ue.reset_transform",
+                     text="Reset transform", icon="LOOP_BACK")
 
         col = layout.column(align=True)
-        col.operator("ue.select_objects", text="Select objects", icon="EYEDROPPER")
+        col.operator("ue.select_objects",
+                     text="Select objects", icon="EYEDROPPER")
 
         col = layout.column(align=True)
-        col.operator("ue.toggle_face_orientation", text="Toggle face orientation", icon="NORMALS_FACE")
+        col.operator("ue.toggle_face_orientation",
+                     text="Toggle face orientation", icon="NORMALS_FACE")
 
 
 def menu_func(self, context):
@@ -103,9 +110,26 @@ def menu_func(self, context):
     self.layout.separator()
 
 
+class UEHelperPrefs(bpy.types.AddonPreferences):
+    bl_idname = __name__
+
+    rpc_response_timeout: bpy.props.IntProperty(
+        name="RPC Response Timeout",
+        default=60,
+        min=0
+    )
+
+    def draw(self, context):
+        layout = self.layout
+
+        col = layout.column()
+        col.prop(self, "rpc_response_timeout")
+
+
 def register():
     auto_load.register()
     bpy.utils.register_class(VIEW3D_PT_UEHelper)
+    bpy.utils.register_class(UEHelperPrefs)
     bpy.types.VIEW3D_MT_mesh_add.prepend(menu_func)
     bpy.app.translations.register(__name__, ue_dict)
 
@@ -113,5 +137,6 @@ def register():
 def unregister():
     bpy.app.translations.unregister(__name__)
     bpy.types.VIEW3D_MT_mesh_add.remove(menu_func)
+    bpy.utils.unregister_class(UEHelperPrefs)
     bpy.utils.unregister_class(VIEW3D_PT_UEHelper)
     auto_load.unregister()
