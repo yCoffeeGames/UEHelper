@@ -100,17 +100,17 @@ class VIEW3D_PT_UEHelper(bpy.types.Panel):
         col.operator("ue.select_sync_objects",
                      text="Select sync objects", icon="EYEDROPPER")
 
-        col = layout.column()
-        row = col.row()
-        row.template_list('UE_UL_SyncList', '', context.scene,
-                          'ue_sync_list', context.scene, 'ue_sync_list_index')
-        col1 = row.column(align=True)
-        col1.operator("ue.mark_sync", text="", icon="ADD").is_remove = False
-        col1.operator("ue.mark_sync", text="", icon="REMOVE").is_remove = True
-        col1.separator()
-        col1.operator("ue.refresh_sync_list", text="",
-                     icon="FILE_REFRESH").is_first = True
-        col.operator("ue.sync_to_ue", text="Sync to UE", icon="UV_SYNC_SELECT")
+        # col = layout.column()
+        # row = col.row()
+        # row.template_list('UE_UL_SyncList', '', context.scene,
+        #                   'ue_sync_list', context.scene, 'ue_sync_list_index')
+        # col1 = row.column(align=True)
+        # col1.operator("ue.mark_sync", text="", icon="ADD").is_remove = False
+        # col1.operator("ue.mark_sync", text="", icon="REMOVE").is_remove = True
+        # col1.separator()
+        # col1.operator("ue.refresh_sync_list", text="",
+        #              icon="FILE_REFRESH").is_first = True
+        # col.operator("ue.sync_to_ue", text="Sync to UE", icon="UV_SYNC_SELECT")
 
         col = layout.column(align=True)
         col.operator("ue.toggle_face_orientation",
