@@ -116,6 +116,7 @@ class SelectSyncObjectsOperator(bpy.types.Operator):
 
         return {"FINISHED"}
 
+
 class SyncListItem(bpy.types.PropertyGroup):
     obj: PointerProperty(
         name="Object",
@@ -145,12 +146,16 @@ class RefreshSyncList(bpy.types.Operator):
     is_first: BoolProperty(default=False)
 
     def execute(self, context):
+        prev_list = dict([(item.obj, item.is_ready_sync)
+                         for item in context.scene.ue_sync_list if len(item.obj.users_scene) > 0])
         context.scene.ue_sync_list.clear()
 
         for obj in context.scene.objects:
             if 'is_sync' in obj and obj['is_sync']:
                 item = context.scene.ue_sync_list.add()
                 item.obj = obj
+                if (item.obj in prev_list.keys()):
+                    item.is_ready_sync = prev_list.get(item.obj)
 
         if (not self.is_first):
             context.scene.ue_sync_list_index = len(
@@ -198,6 +203,7 @@ class SyncToUEOperator(bpy.types.Operator):
         # TODO Open command connection
         # TODO Sync objects
         # TODO Close connection
+        bpy.ops.ue.refresh_sync_list(is_first=True)
         objs = [item.obj for item in context.scene.ue_sync_list if item.is_ready_sync]
         print("Sync meshes to UE:", objs)
         return {"FINISHED"}
