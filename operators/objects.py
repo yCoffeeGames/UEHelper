@@ -96,6 +96,26 @@ class SelectObjectsOperator(bpy.types.Operator):
         return {"FINISHED"}
 
 
+class SelectSyncObjectsOperator(bpy.types.Operator):
+    bl_idname = "ue.select_sync_objects"
+    bl_label = "Select sync objects"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    is_include_notready: BoolProperty(
+        name="Include sync disabled", default=True)
+
+    def execute(self, context):
+        bpy.ops.object.select_all(action='DESELECT')
+
+        for item in context.scene.ue_sync_list:
+            if self.is_include_notready:
+                item.obj.select_set(True)
+            else:
+                if item.is_ready_sync:
+                    item.obj.select_set(True)
+
+        return {"FINISHED"}
+
 class SyncListItem(bpy.types.PropertyGroup):
     obj: PointerProperty(
         name="Object",
@@ -154,7 +174,7 @@ class MarkSync(bpy.types.Operator):
 
     def execute(self, context):
         for obj in context.selected_objects:
-            if(obj.type == "MESH"):
+            if (obj.type == "MESH"):
                 obj['is_sync'] = not self.is_remove
 
         bpy.ops.ue.refresh_sync_list(is_first=self.is_remove)
@@ -174,10 +194,14 @@ class SyncToUEOperator(bpy.types.Operator):
     bl_label = "Sync to UE"
 
     def execute(self, context):
-        #TODO
+        # TODO Run checkers
+        # TODO Open command connection
+        # TODO Sync objects
+        # TODO Close connection
         objs = [item.obj for item in context.scene.ue_sync_list if item.is_ready_sync]
         print("Sync meshes to UE:", objs)
         return {"FINISHED"}
+
 
 def register():
     bpy.types.Scene.ue_sync_list = CollectionProperty(type=SyncListItem)

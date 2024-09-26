@@ -61,7 +61,10 @@ ue_dict = {
 
         ('Operator', 'Toggle face orientation'): '开关面朝向',
         ('*', 'Face orientation: On'): '面朝向: 开',
-        ('*', 'Face orientation: Off'): '面朝向: 关'
+        ('*', 'Face orientation: Off'): '面朝向: 关',
+
+        ('Operator', 'Select sync objects'): '选择同步物体',
+        ('*', 'Include sync disabled'): '包括标记为不同步的'
     }
 }
 
@@ -91,9 +94,11 @@ class VIEW3D_PT_UEHelper(bpy.types.Panel):
         row.operator("ue.reset_transform",
                      text="Reset transform", icon="LOOP_BACK")
 
-        col = layout.column()
+        col = layout.column(align=True)
         col.operator("ue.select_objects",
                      text="Select objects", icon="EYEDROPPER")
+        col.operator("ue.select_sync_objects",
+                     text="Select sync objects", icon="EYEDROPPER")
 
         col = layout.column()
         row = col.row()
