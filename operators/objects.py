@@ -1,5 +1,6 @@
 import bpy
-from bpy.props import StringProperty, BoolProperty, EnumProperty, IntProperty, FloatProperty, FloatVectorProperty
+from bpy.props import StringProperty, BoolProperty, EnumProperty, IntProperty, FloatProperty, FloatVectorProperty, CollectionProperty, PointerProperty
+from ..dependencies.BlenderTools.send2ue import unreal
 
 
 class AddExtraObjectsOperator(bpy.types.Operator):
@@ -74,7 +75,8 @@ class SelectObjectsOperator(bpy.types.Operator):
         ('LIGHT_PROBE', 'Light Probe', ''),
     ))
 
-    is_select_children: BoolProperty(name="Select Children", default=False, description="No matter what type the child is")
+    is_select_children: BoolProperty(
+        name="Select Children", default=False, description="No matter what type the child is")
 
     def select_hierarchy(self, obj):
         obj.select_set(True)
@@ -92,3 +94,97 @@ class SelectObjectsOperator(bpy.types.Operator):
                     self.select_hierarchy(obj)
 
         return {"FINISHED"}
+
+
+class SyncListItem(bpy.types.PropertyGroup):
+    obj: PointerProperty(
+        name="Object",
+        type=bpy.types.Object
+    )
+
+    is_ready_sync: BoolProperty(default=True)
+
+
+class UE_UL_SyncList(bpy.types.UIList):
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
+        if self.layout_type in {'DEFAULT', 'COMPACT'}:
+            row = layout.row(align=True)
+            row.prop(item.obj, 'name', text='',
+                     emboss=False, icon="OUTLINER_OB_MESH")
+            row.prop(item, 'is_ready_sync', icon="UV_SYNC_SELECT",
+                     icon_only=True, toggle=True)
+        elif self.layout_type in {'GRID'}:
+            layout.alignment = 'CENTER'
+            layout.label(text="", icon_value=icon)
+
+
+class RefreshSyncList(bpy.types.Operator):
+    bl_idname = "ue.refresh_sync_list"
+    bl_label = "Refresh UE sync list"
+
+    is_first: BoolProperty(default=False)
+
+    def execute(self, context):
+        context.scene.ue_sync_list.clear()
+
+        for obj in context.scene.objects:
+            if 'is_sync' in obj and obj['is_sync']:
+                item = context.scene.ue_sync_list.add()
+                item.obj = obj
+
+        if (not self.is_first):
+            context.scene.ue_sync_list_index = len(
+                context.scene.ue_sync_list) - 1
+        else:
+            context.scene.ue_sync_list_index = 0
+
+        return {"FINISHED"}
+
+
+class MarkSync(bpy.types.Operator):
+    bl_idname = "ue.mark_sync"
+    bl_label = "Mark selected to sync or not"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    is_remove: BoolProperty(default=False, options={'HIDDEN'})
+
+    @classmethod
+    def poll(cls, context):
+        return len(context.selected_objects) > 0
+
+    def execute(self, context):
+        for obj in context.selected_objects:
+            if(obj.type == "MESH"):
+                obj['is_sync'] = not self.is_remove
+
+        bpy.ops.ue.refresh_sync_list(is_first=self.is_remove)
+        bpy.ops.object.select_all(action='DESELECT')
+        return {"FINISHED"}
+
+
+def on_sync_list_index_changed(self, context):
+    bpy.ops.object.select_all(action='DESELECT')
+    if len(context.scene.ue_sync_list) > 0:
+        context.scene.ue_sync_list[context.scene.ue_sync_list_index].obj.select_set(
+            True)
+
+
+class SyncToUEOperator(bpy.types.Operator):
+    bl_idname = "ue.sync_to_ue"
+    bl_label = "Sync to UE"
+
+    def execute(self, context):
+        #TODO
+        objs = [item.obj for item in context.scene.ue_sync_list if item.is_ready_sync]
+        print("Sync meshes to UE:", objs)
+        return {"FINISHED"}
+
+def register():
+    bpy.types.Scene.ue_sync_list = CollectionProperty(type=SyncListItem)
+    bpy.types.Scene.ue_sync_list_index = IntProperty(
+        name='Sync', default=0, update=on_sync_list_index_changed)
+
+
+def unregister():
+    del bpy.types.Scene.ue_sync_list_index
+    del bpy.types.Scene.ue_sync_list
